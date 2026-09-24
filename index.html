@@ -259,16 +259,19 @@ html,body{max-width:100%;overflow-x:hidden!important}
 (function () {
   const target = new Date("2026-09-24T11:55:00+05:30").getTime();
 
+  let intervalId;
+
   function updateCountdown() {
     const now = new Date().getTime();
     const distance = target - now;
     const timer = document.getElementById("org-timer");
 
-   if (distance <= 0) {
-  document.getElementById("org-countdown").style.display = "none";
-  document.querySelector(".site-shell").style.display = "block";
-  return;
-}
+    if (distance <= 0) {
+      document.getElementById("org-countdown").style.display = "none";
+      document.querySelector(".site-shell").style.display = "block";
+      clearInterval(intervalId);
+      return;
+    }
 
     const days = Math.floor(distance / (1000 * 60 * 60 * 24));
     const hours = Math.floor((distance / (1000 * 60 * 60)) % 24);
@@ -282,8 +285,12 @@ html,body{max-width:100%;overflow-x:hidden!important}
       seconds + " Seconds";
   }
 
-  updateCountdown();
-  setInterval(updateCountdown, 1000);
+  // Wait until the whole page (including .site-shell below) has loaded,
+  // otherwise the site stays hidden after the launch time.
+  document.addEventListener("DOMContentLoaded", function () {
+    intervalId = setInterval(updateCountdown, 1000);
+    updateCountdown();
+  });
 })();
 </script>
 
